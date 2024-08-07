@@ -3,10 +3,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Cat, Heart, Info, Paw, Star, ArrowRight } from "lucide-react";
+import { Cat, Heart, Info, Paw, Star, ArrowRight, ChevronDown } from "lucide-react";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const catImages = [
   "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Cat03.jpg/1200px-Cat03.jpg",
@@ -18,6 +20,7 @@ const Index = () => {
   const [likes, setLikes] = useState(0);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [progress, setProgress] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -74,33 +77,57 @@ const Index = () => {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, delay: 0.6 }}
           >
-            <Button variant="secondary" size="lg" className="group bg-white text-purple-700 hover:bg-pink-100 transition-colors duration-300">
-              <Cat className="mr-2 h-5 w-5 group-hover:rotate-12 transition-transform" /> 
+            <Button 
+              variant="secondary" 
+              size="lg" 
+              className="group bg-white text-purple-700 hover:bg-pink-100 transition-colors duration-300"
+              onMouseEnter={() => setIsHovered(true)}
+              onMouseLeave={() => setIsHovered(false)}
+            >
+              <Cat className={`mr-2 h-5 w-5 transition-transform duration-300 ${isHovered ? 'rotate-12' : ''}`} /> 
               Explore Now
-              <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+              <ArrowRight className={`ml-2 h-5 w-5 transition-transform duration-300 ${isHovered ? 'translate-x-1' : ''}`} />
             </Button>
           </motion.div>
         </div>
+        <motion.div
+          className="absolute bottom-4 left-1/2 transform -translate-x-1/2"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1, duration: 0.5 }}
+        >
+          <ChevronDown className="h-8 w-8 text-white animate-bounce" />
+        </motion.div>
       </motion.div>
       
       <div className="max-w-6xl mx-auto p-8">
         <motion.div
           key={currentImageIndex}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.9 }}
           transition={{ duration: 0.5 }}
-          className="relative mb-12"
+          className="relative mb-12 group"
         >
           <img 
             src={catImages[currentImageIndex]} 
             alt="Cute cat" 
-            className="mx-auto object-cover w-full h-[500px] rounded-lg shadow-2xl"
+            className="mx-auto object-cover w-full h-[500px] rounded-lg shadow-2xl transition-transform duration-300 group-hover:scale-105"
           />
           <Progress value={progress} className="w-full mt-4" />
           <Badge className="absolute top-4 right-4 bg-purple-600 text-white px-3 py-1 text-sm font-semibold">
             Featured Cat
           </Badge>
+          <motion.div 
+            className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-8"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <Button variant="secondary" size="lg" className="bg-white/80 text-purple-700 hover:bg-white">
+              Learn More
+            </Button>
+          </motion.div>
         </motion.div>
         
         <Tabs defaultValue="facts" className="mb-12">
@@ -116,36 +143,63 @@ const Index = () => {
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.3 }}
               >
-                <Card className="bg-gradient-to-br from-purple-50 to-pink-50 border-none shadow-xl">
-                  <CardHeader>
-                    <CardTitle className="flex items-center text-3xl text-purple-700">
+                <Card className="bg-gradient-to-br from-purple-50 to-pink-50 border-none shadow-xl overflow-hidden">
+                  <CardHeader className="relative">
+                    <motion.div
+                      className="absolute inset-0 bg-gradient-to-r from-purple-300/30 to-pink-300/30"
+                      animate={{
+                        background: [
+                          "linear-gradient(to right, rgba(216, 180, 254, 0.3), rgba(249, 168, 212, 0.3))",
+                          "linear-gradient(to left, rgba(216, 180, 254, 0.3), rgba(249, 168, 212, 0.3))",
+                        ],
+                      }}
+                      transition={{ duration: 5, repeat: Infinity, repeatType: "reverse" }}
+                    />
+                    <CardTitle className="flex items-center text-3xl text-purple-700 relative z-10">
                       <Paw className="mr-3 h-8 w-8 text-pink-500" />
                       Fascinating Feline Facts
                     </CardTitle>
-                    <CardDescription className="text-lg text-purple-600">Uncover the mysteries of our purr-fect companions</CardDescription>
+                    <CardDescription className="text-lg text-purple-600 relative z-10">Uncover the mysteries of our purr-fect companions</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <ul className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      {[
-                        "Cats have been domesticated for over 4,000 years.",
-                        "An adult cat has 30 teeth.",
-                        "Cats can jump up to six times their length.",
-                        "A group of cats is called a "clowder".",
-                        "Cats spend 70% of their lives sleeping.",
-                        "A cat's hearing is much more sensitive than a human's or dog's."
-                      ].map((fact, index) => (
-                        <motion.li 
-                          key={index}
-                          className="flex items-start bg-white p-4 rounded-lg shadow-md"
-                          initial={{ opacity: 0, x: -20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ duration: 0.3, delay: index * 0.1 }}
-                        >
-                          <Star className="mr-3 h-6 w-6 text-yellow-500 flex-shrink-0 mt-1" />
-                          <span className="text-purple-800">{fact}</span>
-                        </motion.li>
-                      ))}
-                    </ul>
+                    <ScrollArea className="h-[400px] pr-4">
+                      <ul className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {[
+                          "Cats have been domesticated for over 4,000 years.",
+                          "An adult cat has 30 teeth.",
+                          "Cats can jump up to six times their length.",
+                          "A group of cats is called a "clowder".",
+                          "Cats spend 70% of their lives sleeping.",
+                          "A cat's hearing is much more sensitive than a human's or dog's.",
+                          "Cats have a third eyelid called the 'haw' to protect their eyes.",
+                          "A cat's nose print is unique, like a human's fingerprint.",
+                          "Cats have over 20 different vocalizations for communication.",
+                          "The first cat in space was French, named Felicette, in 1963."
+                        ].map((fact, index) => (
+                          <motion.li 
+                            key={index}
+                            className="flex items-start bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300"
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.3, delay: index * 0.1 }}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                          >
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger>
+                                  <Star className="mr-3 h-6 w-6 text-yellow-500 flex-shrink-0 mt-1" />
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Fun Fact #{index + 1}</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                            <span className="text-purple-800">{fact}</span>
+                          </motion.li>
+                        ))}
+                      </ul>
+                    </ScrollArea>
                   </CardContent>
                 </Card>
               </motion.div>
@@ -207,10 +261,18 @@ const Index = () => {
             variant="outline" 
             size="lg" 
             onClick={() => setLikes(likes + 1)}
-            className="group bg-gradient-to-r from-purple-500 to-pink-500 text-white border-none hover:from-purple-600 hover:to-pink-600 transition-all duration-300"
+            className="group bg-gradient-to-r from-purple-500 to-pink-500 text-white border-none hover:from-purple-600 hover:to-pink-600 transition-all duration-300 relative overflow-hidden"
           >
-            <Heart className="mr-2 h-6 w-6 group-hover:text-red-200 transition-colors" />
-            Love Cats! ({likes})
+            <span className="relative z-10 flex items-center">
+              <Heart className="mr-2 h-6 w-6 group-hover:text-red-200 transition-colors" />
+              Love Cats! ({likes})
+            </span>
+            <motion.div
+              className="absolute inset-0 bg-white"
+              initial={{ scale: 0, opacity: 0 }}
+              whileTap={{ scale: 4, opacity: 0.5 }}
+              transition={{ duration: 0.5 }}
+            />
           </Button>
         </motion.div>
       </div>

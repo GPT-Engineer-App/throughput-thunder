@@ -1,19 +1,23 @@
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Cat, Heart, Info, Paw, Star, ArrowRight, ChevronDown } from "lucide-react";
+import { Cat, Heart, Info, Paw, Star, ArrowRight, ChevronDown, Instagram, Twitter, Facebook } from "lucide-react";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
 
 const catImages = [
   "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Cat03.jpg/1200px-Cat03.jpg",
   "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Cat_November_2010-1a.jpg/1200px-Cat_November_2010-1a.jpg",
   "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bb/Kittyply_edit1.jpg/1200px-Kittyply_edit1.jpg",
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Orange_tabby_cat_sitting_on_fallen_leaves-Hisashi-01A.jpg/1200px-Orange_tabby_cat_sitting_on_fallen_leaves-Hisashi-01A.jpg",
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/Collage_of_Six_Cats-02.jpg/1200px-Collage_of_Six_Cats-02.jpg",
 ];
 
 const Index = () => {
@@ -21,6 +25,14 @@ const Index = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [progress, setProgress] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
+  const [email, setEmail] = useState("");
+  const heroRef = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: heroRef,
+    offset: ["start start", "end start"],
+  });
+  const opacity = useTransform(scrollYProgress, [0, 1], [1, 0]);
+  const scale = useTransform(scrollYProgress, [0, 1], [1, 0.8]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -38,13 +50,25 @@ const Index = () => {
     };
   }, []);
 
+  const handleSubscribe = (e) => {
+    e.preventDefault();
+    if (email) {
+      toast.success("Thanks for subscribing! Meow-velous choice!");
+      setEmail("");
+    } else {
+      toast.error("Please enter a valid email address.");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-100 to-pink-100">
       <motion.div 
+        ref={heroRef}
         className="bg-gradient-to-r from-purple-700 to-pink-600 text-white py-24 px-4 relative overflow-hidden"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1 }}
+        style={{ opacity, scale }}
       >
         <motion.div 
           className="absolute inset-0 opacity-10"
@@ -57,20 +81,20 @@ const Index = () => {
         />
         <div className="max-w-4xl mx-auto text-center relative z-10">
           <motion.h1 
-            className="text-7xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white to-pink-200"
+            className="text-8xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white to-pink-200"
             initial={{ opacity: 0, y: -50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            Discover the World of Cats
+            Discover the Purr-fect World of Cats
           </motion.h1>
           <motion.p 
-            className="text-2xl mb-10 text-pink-100"
+            className="text-3xl mb-10 text-pink-100"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.4 }}
           >
-            Explore fascinating facts and popular breeds of our feline friends
+            Uncover fascinating facts, adorable breeds, and the magic of our feline companions
           </motion.p>
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
@@ -84,9 +108,9 @@ const Index = () => {
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
             >
-              <Cat className={`mr-2 h-5 w-5 transition-transform duration-300 ${isHovered ? 'rotate-12' : ''}`} /> 
-              Explore Now
-              <ArrowRight className={`ml-2 h-5 w-5 transition-transform duration-300 ${isHovered ? 'translate-x-1' : ''}`} />
+              <Cat className={`mr-2 h-6 w-6 transition-transform duration-300 ${isHovered ? 'rotate-12' : ''}`} /> 
+              Start Your Feline Adventure
+              <ArrowRight className={`ml-2 h-6 w-6 transition-transform duration-300 ${isHovered ? 'translate-x-1' : ''}`} />
             </Button>
           </motion.div>
         </div>
@@ -112,11 +136,11 @@ const Index = () => {
           <img 
             src={catImages[currentImageIndex]} 
             alt="Cute cat" 
-            className="mx-auto object-cover w-full h-[500px] rounded-lg shadow-2xl transition-transform duration-300 group-hover:scale-105"
+            className="mx-auto object-cover w-full h-[600px] rounded-lg shadow-2xl transition-transform duration-300 group-hover:scale-105"
           />
           <Progress value={progress} className="w-full mt-4" />
           <Badge className="absolute top-4 right-4 bg-purple-600 text-white px-3 py-1 text-sm font-semibold">
-            Featured Cat
+            Featured Feline
           </Badge>
           <motion.div 
             className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-8"
@@ -125,9 +149,36 @@ const Index = () => {
             exit={{ opacity: 0 }}
           >
             <Button variant="secondary" size="lg" className="bg-white/80 text-purple-700 hover:bg-white">
-              Learn More
+              Discover This Breed
             </Button>
           </motion.div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5, duration: 0.5 }}
+          className="text-center mb-12"
+        >
+          <h2 className="text-4xl font-bold text-purple-700 mb-4">Why Cats Make Purr-fect Companions</h2>
+          <p className="text-xl text-purple-600 mb-8">Discover the joy and comfort that feline friends bring to our lives</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              { title: "Stress Relief", description: "Petting a cat can lower blood pressure and reduce stress.", icon: <Heart className="h-12 w-12 text-pink-500" /> },
+              { title: "Low Maintenance", description: "Cats are independent and require less attention than dogs.", icon: <Paw className="h-12 w-12 text-purple-500" /> },
+              { title: "Quiet Companionship", description: "Enjoy the silent company of your feline friend.", icon: <Cat className="h-12 w-12 text-pink-500" /> },
+            ].map((item, index) => (
+              <Card key={index} className="bg-white shadow-lg hover:shadow-xl transition-shadow duration-300">
+                <CardHeader>
+                  <div className="mx-auto">{item.icon}</div>
+                  <CardTitle className="text-2xl text-center text-purple-700">{item.title}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-center text-purple-600">{item.description}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </motion.div>
         
         <Tabs defaultValue="facts" className="mb-12">
@@ -253,19 +304,22 @@ const Index = () => {
         </Tabs>
         
         <motion.div 
-          className="text-center"
+          className="text-center mb-16"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
           <Button 
             variant="outline" 
             size="lg" 
-            onClick={() => setLikes(likes + 1)}
+            onClick={() => {
+              setLikes(likes + 1);
+              toast.success("Thanks for the love! Meow!");
+            }}
             className="group bg-gradient-to-r from-purple-500 to-pink-500 text-white border-none hover:from-purple-600 hover:to-pink-600 transition-all duration-300 relative overflow-hidden"
           >
-            <span className="relative z-10 flex items-center">
-              <Heart className="mr-2 h-6 w-6 group-hover:text-red-200 transition-colors" />
-              Love Cats! ({likes})
+            <span className="relative z-10 flex items-center text-xl">
+              <Heart className="mr-2 h-8 w-8 group-hover:text-red-200 transition-colors" />
+              Show Some Cat Love! ({likes})
             </span>
             <motion.div
               className="absolute inset-0 bg-white"
@@ -277,24 +331,39 @@ const Index = () => {
         </motion.div>
       </div>
       
-      <footer className="bg-gradient-to-r from-purple-700 to-pink-600 text-white py-12 mt-16">
+      <footer className="bg-gradient-to-r from-purple-700 to-pink-600 text-white py-16 mt-16">
         <div className="max-w-6xl mx-auto text-center px-4">
-          <h2 className="text-3xl font-bold mb-6">Stay Connected with Cat Lovers United</h2>
-          <p className="text-xl mb-8">Join our community and receive weekly cat facts and adorable photos!</p>
-          <div className="flex justify-center space-x-4 mb-8">
-            <Button variant="secondary" size="lg" className="bg-white text-purple-700 hover:bg-pink-100">
-              Subscribe Now
+          <h2 className="text-4xl font-bold mb-6">Join the Feline Frenzy!</h2>
+          <p className="text-2xl mb-8">Subscribe for weekly cat facts, adorable photos, and exclusive content!</p>
+          <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4 mb-8">
+            <Input
+              type="email"
+              placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full sm:w-64 bg-white text-purple-700"
+            />
+            <Button type="submit" variant="secondary" size="lg" className="w-full sm:w-auto bg-white text-purple-700 hover:bg-pink-100">
+              Subscribe Meow!
             </Button>
-            <Button variant="outline" size="lg" className="border-white text-white hover:bg-white hover:text-purple-700">
-              Learn More
+          </form>
+          <div className="flex justify-center space-x-6 mb-8">
+            <Button variant="ghost" size="icon" className="text-white hover:text-pink-200">
+              <Facebook className="h-6 w-6" />
+            </Button>
+            <Button variant="ghost" size="icon" className="text-white hover:text-pink-200">
+              <Twitter className="h-6 w-6" />
+            </Button>
+            <Button variant="ghost" size="icon" className="text-white hover:text-pink-200">
+              <Instagram className="h-6 w-6" />
             </Button>
           </div>
           <p className="text-lg">© 2023 Cat Lovers United. All rights reserved.</p>
           <div className="mt-6 flex flex-wrap justify-center gap-4">
-            <Button variant="ghost" size="sm" className="text-white hover:text-pink-200">About Us</Button>
-            <Button variant="ghost" size="sm" className="text-white hover:text-pink-200">Contact</Button>
-            <Button variant="ghost" size="sm" className="text-white hover:text-pink-200">Privacy Policy</Button>
-            <Button variant="ghost" size="sm" className="text-white hover:text-pink-200">Terms of Service</Button>
+            <Button variant="link" size="sm" className="text-white hover:text-pink-200">About Us</Button>
+            <Button variant="link" size="sm" className="text-white hover:text-pink-200">Contact</Button>
+            <Button variant="link" size="sm" className="text-white hover:text-pink-200">Privacy Policy</Button>
+            <Button variant="link" size="sm" className="text-white hover:text-pink-200">Terms of Service</Button>
           </div>
         </div>
       </footer>
